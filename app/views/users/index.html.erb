@@ -1,0 +1,10 @@
+<% @users.each do |user| %>
+    <div>
+        <%= user.first_name %>
+        <%= user.last_name %>
+        <br/>
+        <%= user.matches.length %> Matches!
+        <br/>
+        <br/>
+    </div>
+<% end %>
