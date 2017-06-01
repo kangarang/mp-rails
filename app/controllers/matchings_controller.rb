@@ -17,17 +17,17 @@ class MatchingsController < ApplicationController
     end
 
     def show_matches
-        user = User.where(uid: params[:uid])[0]
-        user_matches = user.matches
-
-        new_array = user_matches.select{|it| it.matches.include?(user)}
 
         send_arr = []
 
-        new_array.each do |one|
-            our_room = (user.rooms & one.rooms)[0]["name"]
-            send_obj = {user: one, events: user.events & one.events, artists: one.artists & user.artists, room: our_room}
-            send_arr.push(send_obj)
+        @user = User.where(uid: params[:uid])[0]
+
+        @user.matches.each do |it|
+            if it.matches.include?(@user)
+                our_rooms = @user.rooms & it.rooms
+                send_obj = {user: it, events: @user.events & it.events, artists: @user.artists & it.artists, room: our_rooms[0]["name"]}
+                send_arr.push(send_obj)
+            end
         end
 
         render json: {
