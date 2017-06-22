@@ -177,9 +177,9 @@ class UsersController < ApplicationController
             if Artist.exists?(aid: single["id"])
                 dupe_artist = Artist.where(aid: single["id"])[0]
 
-                if @user.artists.include?(dupe_artist)
+                if dupe_artist.users.include?(@user)
                 else
-                    @user.artists << dupe_artist
+                    dupe_artist.users << @user
                 end
 
             else
