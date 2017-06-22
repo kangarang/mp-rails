@@ -97,7 +97,12 @@ ActiveRecord::Schema.define(version: 20170622053922) do
     t.integer "age_pref_high"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["uid", "age", "gender", "seeking"], name: "index_users_on_uid_and_age_and_gender_and_seeking"
+    t.index ["age"], name: "index_users_on_age"
+    t.index ["age_pref_high"], name: "index_users_on_age_pref_high"
+    t.index ["age_pref_low"], name: "index_users_on_age_pref_low"
+    t.index ["gender"], name: "index_users_on_gender"
+    t.index ["seeking"], name: "index_users_on_seeking"
+    t.index ["uid"], name: "index_users_on_uid"
   end
 
 end

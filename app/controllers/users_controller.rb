@@ -159,7 +159,9 @@ class UsersController < ApplicationController
                         @artists.concat(artists_three)
                         if (@artists.size > 149)
                             artists_four = self.get_sk_artists('4')
-                            @artists.concat(artists_four)
+                            if artists_four
+                                @artists.concat(artists_four)
+                            end
                         end
                     end
                 end
