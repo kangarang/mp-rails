@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170529064818) do
+ActiveRecord::Schema.define(version: 20170622053922) do
 
   create_table "artists", force: :cascade do |t|
     t.string "name"
@@ -22,6 +22,8 @@ ActiveRecord::Schema.define(version: 20170529064818) do
   create_table "artists_users", id: false, force: :cascade do |t|
     t.integer "artist_id", null: false
     t.integer "user_id", null: false
+    t.index ["artist_id", "user_id"], name: "index_artists_users_on_artist_id_and_user_id"
+    t.index ["user_id", "artist_id"], name: "index_artists_users_on_user_id_and_artist_id"
   end
 
   create_table "blacklistings", force: :cascade do |t|
@@ -45,6 +47,8 @@ ActiveRecord::Schema.define(version: 20170529064818) do
   create_table "events_users", id: false, force: :cascade do |t|
     t.integer "event_id", null: false
     t.integer "user_id", null: false
+    t.index ["event_id", "user_id"], name: "index_events_users_on_event_id_and_user_id"
+    t.index ["user_id", "event_id"], name: "index_events_users_on_user_id_and_event_id"
   end
 
   create_table "matchings", force: :cascade do |t|
@@ -93,6 +97,7 @@ ActiveRecord::Schema.define(version: 20170529064818) do
     t.integer "age_pref_high"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["uid", "age", "gender", "seeking"], name: "index_users_on_uid_and_age_and_gender_and_seeking"
   end
 
 end

@@ -17,6 +17,10 @@ class UsersController < ApplicationController
         render json: @users
     end
 
+    def show
+        render json: Person.find(params[:id])
+    end
+
     def find_user
         if @user
             return @user
@@ -119,6 +123,7 @@ class UsersController < ApplicationController
                 if Event.exists?(eid: it["event"]["id"])
                     dupe_event = Event.where(eid: it['event']['id'])[0]
                     @dupe_events.push(dupe_event)
+
                     if @user.events.include?(dupe_event)
                     else
                         @user.events << dupe_event
@@ -154,9 +159,7 @@ class UsersController < ApplicationController
                         @artists.concat(artists_three)
                         if (@artists.size > 149)
                             artists_four = self.get_sk_artists('4')
-                            if (artists_four.size > 0)
-                                @artists.concat(artists_four)
-                            end
+                            @artists.concat(artists_four)
                         end
                     end
                 end
@@ -171,11 +174,12 @@ class UsersController < ApplicationController
         @artists.each do |single|
             if Artist.exists?(aid: single["id"])
                 dupe_artist = Artist.where(aid: single["id"])[0]
-                if @user.artists.include?(dupe_artist)
 
+                if @user.artists.include?(dupe_artist)
                 else
                     @user.artists << dupe_artist
                 end
+
             else
                 new_artist = Artist.new(name: single["displayName"], aid: single["id"])
 
@@ -190,8 +194,8 @@ class UsersController < ApplicationController
 
         @users_matched_prefs.each do |same_prefs|
 
-            shared_artists = same_prefs.artists & @user.artists
-            shared_events = same_prefs.events & @user.events
+            shared_artists = same_prefs.artists.includes(:users) & @user.artists
+            shared_events = same_prefs.events.includes(:users) & @user.events
 
             puts 'shared::::::'
             puts shared_artists
