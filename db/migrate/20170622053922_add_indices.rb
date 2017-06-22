@@ -7,5 +7,8 @@ class AddIndices < ActiveRecord::Migration[5.1]
       add_index :users, :age_pref_low
       add_index :users, :age_pref_high
       add_index :users, :songkick_username
+
+      add_index :events, :eid
+      add_index :artists, :aid
   end
 end

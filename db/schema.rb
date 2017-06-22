@@ -17,6 +17,7 @@ ActiveRecord::Schema.define(version: 20170622053922) do
     t.integer "aid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["aid"], name: "index_artists_on_aid"
   end
 
   create_table "artists_users", id: false, force: :cascade do |t|
@@ -42,6 +43,7 @@ ActiveRecord::Schema.define(version: 20170622053922) do
     t.integer "eid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["eid"], name: "index_events_on_eid"
   end
 
   create_table "events_users", id: false, force: :cascade do |t|
@@ -102,6 +104,7 @@ ActiveRecord::Schema.define(version: 20170622053922) do
     t.index ["age_pref_low"], name: "index_users_on_age_pref_low"
     t.index ["gender"], name: "index_users_on_gender"
     t.index ["seeking"], name: "index_users_on_seeking"
+    t.index ["songkick_username"], name: "index_users_on_songkick_username"
     t.index ["uid"], name: "index_users_on_uid"
   end
 
