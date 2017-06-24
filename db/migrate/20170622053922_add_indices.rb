@@ -1,13 +1,12 @@
 class AddIndices < ActiveRecord::Migration[5.1]
   def change
-      add_index :users, :uid
-      add_index :users, :age
-      add_index :users, :gender
-      add_index :users, :seeking
-      add_index :users, :age_pref_low
-      add_index :users, :age_pref_high
-      add_index :users, :songkick_username
+      add_index :potentialings, [:potential_id, :user_id]
+      add_index :matchings, [:match_id, :user_id]
+      add_index :blacklistings, [:blacklist_id, :user_id]
 
+      add_index :users, [:age, :gender, :seeking]
+
+      add_index :users, :uid
       add_index :events, :eid
       add_index :artists, :aid
   end

@@ -7,7 +7,7 @@ class UsersController < ApplicationController
         @users
         @users_matched_prefs = []
         @artists
-        @dupe_events = []
+        @dupe_events
     end
 
     def index
@@ -28,7 +28,7 @@ class UsersController < ApplicationController
             if session[:current_user_id]
                 @user = User.find(session[:current_user_id])
             else
-                @user = User.where(uid: params[:uid])[0]
+                @user = User.find_by_uid(params[:uid])
                 session[:current_user_id] = @user.id
             end
         end
@@ -53,14 +53,14 @@ class UsersController < ApplicationController
         self.find_matches_using_prefs
     end
 
-    def render_potentials
-        self.find_user
-        if @user
-            self.not_first_time
-        else
-            render json: {'error': "no user"}
-        end
-    end
+    # def render_potentials
+    #     self.find_user
+    #     if @user
+    #         self.not_first_time
+    #     else
+    #         render json: {'error': "no user"}
+    #     end
+    # end
 
     def not_first_time
         true_potentials = @user.potentials - @user.blacklists
@@ -80,7 +80,7 @@ class UsersController < ApplicationController
     def find_matches_using_prefs
         # @users_matched_prefs = User.where(gender: @user.seeking, location: @user.location, seeking: @user.gender, ethnicity: @user.eth_pref, eth_pref: @user.ethnicity, age: @user.age_pref_low..@user.age_pref_high).where("age_pref_low <= ?", @user.age).where("age_pref_high >= ?", @user.age)
 
-        @users_matched_prefs = User.where(gender: @user.seeking, seeking: @user.gender, location: @user.location, age: @user.age_pref_low..@user.age_pref_high).where("age_pref_low <= ?", @user.age).where("age_pref_high >= ?", @user.age)
+        @users_matched_prefs = User.where(gender: @user.seeking, seeking: @user.gender, location: @user.location, age: @user.age_pref_low..@user.age_pref_high).where("age_pref_low <= ?", @user.age).where("age_pref_high >= ?", @user.age).includes(:events, :artists)
 
         @users_matched_prefs = @users_matched_prefs - @user.blacklists
 
@@ -118,23 +118,32 @@ class UsersController < ApplicationController
     end
 
     def add_events
+
+        eid_array = @events.map { |it|
+            it['event']['id'] 
+        }
+        @dupe_events = Event.includes(:users).where(eid: eid_array)
+
+        dupe_event_ids = @dupe_events.map{ |it|
+            it.eid
+        }
+
+        @dupe_events.each do |it|
+            if it.users.include?(@user)
+            else
+                it.users << @user
+            end
+        end
+
+        @events.delete_if { |it|
+            dupe_event_ids.include?(it['event']['id'])
+        }
+
         @events.each do |it|
-            if it["event"]["type"] === "Concert"
-                if Event.exists?(eid: it["event"]["id"])
-                    dupe_event = Event.where(eid: it['event']['id'])[0]
-                    @dupe_events.push(dupe_event)
+            new_event = Event.new(eid: it["event"]["id"], event_name: it["event"]["displayName"], date: it["event"]["start"]["date"], uri: it["event"]["uri"], venue: it["event"]["venue"]["displayName"], reason_artist: it["reason"]["trackedArtist"][0]["displayName"]).includes(:users)
 
-                    if @user.events.include?(dupe_event)
-                    else
-                        @user.events << dupe_event
-                    end
-                else
-                    new_event = Event.new(eid: it["event"]["id"], event_name: it["event"]["displayName"], date: it["event"]["start"]["date"], uri: it["event"]["uri"], venue: it["event"]["venue"]["displayName"], reason_artist: it["reason"]["trackedArtist"][0]["displayName"])
-
-                    if new_event.save
-                        @user.events << new_event
-                    end
-                end
+            if new_event.save
+                new_event.users << @user
             end
         end
     end
@@ -148,16 +157,15 @@ class UsersController < ApplicationController
     def songkick_artists
         artists_one = self.get_sk_artists('1')
         @artists = artists_one
-
         if (@artists.size > 49)
             artists_two = self.get_sk_artists('2')
             if (artists_two.size > 0)
                 @artists.concat(artists_two)
-                if (@artists.size > 99)
+                if (@artists.size > 98)
                     artists_three = self.get_sk_artists('3')
                     if (artists_three.size > 0)
                         @artists.concat(artists_three)
-                        if (@artists.size > 149)
+                        if (@artists.size > 147)
                             artists_four = self.get_sk_artists('4')
                             if artists_four
                                 @artists.concat(artists_four)
@@ -167,27 +175,37 @@ class UsersController < ApplicationController
                 end
             end
         end
-        # if @artists.size > 0
-        #     self.add_artists
-        # end
+        # puts 'artists.size'
+        # puts @artists.size
     end
 
     def add_artists
-        @artists.each do |single|
-            if Artist.exists?(aid: single["id"])
-                dupe_artist = Artist.where(aid: single["id"])[0]
+        aid_array = @artists.map { |it|
+            it['id'] 
+        }
 
-                if dupe_artist.users.include?(@user)
-                else
-                    dupe_artist.users << @user
-                end
+        @dupe_artists = Artist.includes(:users).where(aid: aid_array)
 
+        dupe_artist_ids = @dupe_artists.map{ |it|
+            it.aid
+        }
+
+        @dupe_artists.each do |it|
+            if it.users.include?(@user)
             else
-                new_artist = Artist.new(name: single["displayName"], aid: single["id"])
+                it.users << @user
+            end
+        end
 
-                if new_artist.save
-                    @user.artists << new_artist
-                end
+        @artists.delete_if { |it|
+            dupe_artist_ids.include?(it['id'])
+        }
+
+        @artists.each do |it|
+            new_artist = Artist.new(aid: it['id'], name: it['displayName']).includes(:users)
+
+            if new_artist.save
+                new_artist.users << @user
             end
         end
     end
@@ -196,11 +214,12 @@ class UsersController < ApplicationController
 
         @users_matched_prefs.each do |same_prefs|
 
-            shared_artists = same_prefs.artists.includes(:users) & @user.artists
-            shared_events = same_prefs.events.includes(:users) & @user.events
+            shared_artists = same_prefs.artists & @user.artists
+            shared_events = same_prefs.events & @user.events
 
-            puts 'shared::::::'
-            puts shared_artists
+            # puts 'shared::::::'
+            # puts same_prefs
+            # puts shared_artists
 
             if shared_artists.length > 0 && shared_events.length > 0
                 if @user.potentials.exclude?(same_prefs)

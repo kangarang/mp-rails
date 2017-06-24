@@ -1,4 +1,5 @@
 class EventsController < ApplicationController
+    attr_reader :eid
 
     def index
         events = Event.all

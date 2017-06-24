@@ -12,6 +12,9 @@
 
 ActiveRecord::Schema.define(version: 20170622053922) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "artists", force: :cascade do |t|
     t.string "name"
     t.integer "aid"
@@ -21,10 +24,8 @@ ActiveRecord::Schema.define(version: 20170622053922) do
   end
 
   create_table "artists_users", id: false, force: :cascade do |t|
-    t.integer "artist_id", null: false
-    t.integer "user_id", null: false
-    t.index ["artist_id", "user_id"], name: "index_artists_users_on_artist_id_and_user_id"
-    t.index ["user_id", "artist_id"], name: "index_artists_users_on_user_id_and_artist_id"
+    t.bigint "artist_id", null: false
+    t.bigint "user_id", null: false
   end
 
   create_table "blacklistings", force: :cascade do |t|
@@ -32,6 +33,7 @@ ActiveRecord::Schema.define(version: 20170622053922) do
     t.integer "blacklist_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["blacklist_id", "user_id"], name: "index_blacklistings_on_blacklist_id_and_user_id"
   end
 
   create_table "events", force: :cascade do |t|
@@ -47,10 +49,8 @@ ActiveRecord::Schema.define(version: 20170622053922) do
   end
 
   create_table "events_users", id: false, force: :cascade do |t|
-    t.integer "event_id", null: false
-    t.integer "user_id", null: false
-    t.index ["event_id", "user_id"], name: "index_events_users_on_event_id_and_user_id"
-    t.index ["user_id", "event_id"], name: "index_events_users_on_user_id_and_event_id"
+    t.bigint "event_id", null: false
+    t.bigint "user_id", null: false
   end
 
   create_table "matchings", force: :cascade do |t|
@@ -58,6 +58,7 @@ ActiveRecord::Schema.define(version: 20170622053922) do
     t.integer "match_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["match_id", "user_id"], name: "index_matchings_on_match_id_and_user_id"
   end
 
   create_table "potentialings", force: :cascade do |t|
@@ -65,6 +66,7 @@ ActiveRecord::Schema.define(version: 20170622053922) do
     t.integer "potential_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["potential_id", "user_id"], name: "index_potentialings_on_potential_id_and_user_id"
   end
 
   create_table "rooms", force: :cascade do |t|
@@ -74,8 +76,8 @@ ActiveRecord::Schema.define(version: 20170622053922) do
   end
 
   create_table "rooms_users", id: false, force: :cascade do |t|
-    t.integer "room_id", null: false
-    t.integer "user_id", null: false
+    t.bigint "room_id", null: false
+    t.bigint "user_id", null: false
   end
 
   create_table "users", force: :cascade do |t|
@@ -99,12 +101,7 @@ ActiveRecord::Schema.define(version: 20170622053922) do
     t.integer "age_pref_high"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["age"], name: "index_users_on_age"
-    t.index ["age_pref_high"], name: "index_users_on_age_pref_high"
-    t.index ["age_pref_low"], name: "index_users_on_age_pref_low"
-    t.index ["gender"], name: "index_users_on_gender"
-    t.index ["seeking"], name: "index_users_on_seeking"
-    t.index ["songkick_username"], name: "index_users_on_songkick_username"
+    t.index ["age", "gender", "seeking"], name: "index_users_on_age_and_gender_and_seeking"
     t.index ["uid"], name: "index_users_on_uid"
   end
 
