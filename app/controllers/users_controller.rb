@@ -140,7 +140,7 @@ class UsersController < ApplicationController
         }
 
         @events.each do |it|
-            new_event = Event.new(eid: it["event"]["id"], event_name: it["event"]["displayName"], date: it["event"]["start"]["date"], uri: it["event"]["uri"], venue: it["event"]["venue"]["displayName"], reason_artist: it["reason"]["trackedArtist"][0]["displayName"]).includes(:users)
+            new_event = Event.new(eid: it["event"]["id"], event_name: it["event"]["displayName"], date: it["event"]["start"]["date"], uri: it["event"]["uri"], venue: it["event"]["venue"]["displayName"], reason_artist: it["reason"]["trackedArtist"][0]["displayName"])
 
             if new_event.save
                 new_event.users << @user
@@ -202,7 +202,7 @@ class UsersController < ApplicationController
         }
 
         @artists.each do |it|
-            new_artist = Artist.new(aid: it['id'], name: it['displayName']).includes(:users)
+            new_artist = Artist.new(aid: it['id'], name: it['displayName'])
 
             if new_artist.save
                 new_artist.users << @user

@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(version: 20170622053922) do
   create_table "artists_users", id: false, force: :cascade do |t|
     t.bigint "artist_id", null: false
     t.bigint "user_id", null: false
+    t.index ["artist_id", "user_id"], name: "index_artists_users_on_artist_id_and_user_id"
   end
 
   create_table "blacklistings", force: :cascade do |t|
@@ -51,6 +52,7 @@ ActiveRecord::Schema.define(version: 20170622053922) do
   create_table "events_users", id: false, force: :cascade do |t|
     t.bigint "event_id", null: false
     t.bigint "user_id", null: false
+    t.index ["event_id", "user_id"], name: "index_events_users_on_event_id_and_user_id"
   end
 
   create_table "matchings", force: :cascade do |t|
@@ -78,6 +80,7 @@ ActiveRecord::Schema.define(version: 20170622053922) do
   create_table "rooms_users", id: false, force: :cascade do |t|
     t.bigint "room_id", null: false
     t.bigint "user_id", null: false
+    t.index ["room_id", "user_id"], name: "index_rooms_users_on_room_id_and_user_id"
   end
 
   create_table "users", force: :cascade do |t|
