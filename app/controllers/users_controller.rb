@@ -13,12 +13,17 @@ class UsersController < ApplicationController
     def index
         puts "\n    ISAAC"
         puts ""
-        @users = User.all
-        render json: @users
+        @users = User.all.includes(:events)
+        render json: @users[4].events
+        # self.new_day_button
     end
 
     def show
         render json: Person.find(params[:id])
+    end
+
+    def service
+        render :service
     end
 
     def find_user
@@ -28,6 +33,7 @@ class UsersController < ApplicationController
             if session[:current_user_id]
                 @user = User.find(session[:current_user_id])
             else
+                puts params.inspect
                 @user = User.find_by_uid(params[:uid])
                 session[:current_user_id] = @user.id
             end
@@ -84,6 +90,7 @@ class UsersController < ApplicationController
 
         @users_matched_prefs = @users_matched_prefs - @user.blacklists
 
+        # render :potentials
         self.songkick
     end
 
@@ -231,7 +238,9 @@ class UsersController < ApplicationController
             end
         end
 
-        render json: {"songkick_matches": @songkick_matches, "dupe_events": @dupe_events, "artists": @user.artists}
+        render :potentials
+
+        # render json: {"songkick_matches": @songkick_matches, "dupe_events": @dupe_events, "artists": @user.artists}
 
     end
 

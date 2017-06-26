@@ -4,7 +4,7 @@ Rails.application.configure do
     # Enable bullet in your application
     Bullet.enable = true
     Bullet.rails_logger = true
-
+    
   end
   # Settings specified here will take precedence over those in config/application.rb.
 

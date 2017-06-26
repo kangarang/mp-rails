@@ -22,8 +22,6 @@ class EventsController < ApplicationController
         ActiveRecord::Base.connection.execute("DELETE from sqlite_sequence where name = 'blacklistings'")
         ActiveRecord::Base.connection.execute("DELETE from sqlite_sequence where name = 'potentialings'")
 
-        render json: {"destroy func": "done"}
-
     end
 
 end

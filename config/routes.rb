@@ -20,7 +20,7 @@ Rails.application.routes.draw do
   # get "/users/:uid"           => "users#render_potentials"
   # get "/users/new_day/:uid"   => "users#new_day_button"
   get '/users/:uid' => 'users#new_day_button'
-
+  get '/service-worker.js' => "users#service"
   get '/users/profile/:uid'   => 'users#get_profile'
 
   post '/users/:uid'          => 'users#black_list'
