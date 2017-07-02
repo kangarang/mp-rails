@@ -26,7 +26,6 @@ QueryType = GraphQL::ObjectType.define do
     field :user do
         type UserType
         argument :id, !types.ID
-        # argument :id, !types.String
         resolve -> (root, args, ctx) { User.find(args[:id]) }
     end
 
